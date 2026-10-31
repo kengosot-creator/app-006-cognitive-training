@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -6,31 +7,33 @@
   <meta name="theme-color" content="#526b91">
   <link rel="manifest" href="manifest.json">
   <title>認知課題トレーニング</title>
+
   <style>
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      padding: 20px;
+      padding: 16px;
       background: #f4f6fa;
       color: #273449;
       font-family: sans-serif;
     }
 
     main {
-      max-width: 700px;
+      max-width: 850px;
       margin: auto;
       background: white;
-      padding: 24px;
+      padding: 22px;
       border-radius: 20px;
       text-align: center;
+      min-height: 500px;
     }
 
     h1 { color: #354b6b; }
 
     button, input, select {
       font-size: 18px;
-      padding: 14px;
+      padding: 13px;
       border-radius: 12px;
     }
 
@@ -46,6 +49,11 @@
       font-weight: bold;
     }
 
+    button:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
     .primary {
       background: #526b91;
       color: white;
@@ -54,51 +62,215 @@
 
     .rule {
       background: #edf2f8;
-      padding: 18px;
+      padding: 15px;
       border-radius: 12px;
-      font-size: 21px;
+      font-size: 20px;
       font-weight: bold;
+      margin: 15px 0;
+    }
+
+    .hidden { display: none !important; }
+
+    /* 仕分けエリア */
+    .sorting-board {
+      display: grid;
+      grid-template-columns: 1fr 130px 1fr;
+      gap: 10px;
+      align-items: stretch;
       margin: 20px 0;
     }
 
-    .shape-area {
-      min-height: 200px;
+    .sorting-column {
+      background: #f0f3f8;
+      border-radius: 14px;
+      padding: 10px;
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .column-title {
+      font-weight: bold;
+      color: #354b6b;
+      font-size: 17px;
+      padding: 8px;
+      border-bottom: 2px solid #d3dce9;
+      width: 100%;
+    }
+
+    .item-list {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .sorted-item {
+      width: 64px;
+      height: 64px;
+      background: white;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+      flex-shrink: 0;
+    }
+
+    .sorted-item svg {
+      width: 48px;
+      height: 48px;
+    }
+
+    .result-mark {
+      position: absolute;
+      right: -7px;
+      top: -7px;
+      width: 27px;
+      height: 27px;
+      border-radius: 50%;
+      background: white;
+      font-size: 23px;
+      font-weight: bold;
+      line-height: 27px;
+      display: none;
+    }
+
+    .review-mode .result-mark {
+      display: block;
+    }
+
+    .mark-correct { color: #16a34a; }
+    .mark-wrong { color: #dc4444; }
+
+    /* 中央の問題表示 */
+    .center-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 55px;
+    }
+
+    .current-label {
+      font-size: 13px;
+      color: #78869a;
+      margin-bottom: 12px;
+    }
+
+    .current-shape {
+      width: 110px;
+      height: 110px;
       display: grid;
       place-items: center;
       background: #fafbfd;
       border-radius: 15px;
-      margin: 20px 0;
     }
 
-    .shape {
-      width: 110px;
-      height: 110px;
+    .current-shape svg {
+      width: 90px;
+      height: 90px;
     }
 
     .targets {
       display: flex;
       gap: 12px;
+      margin-top: 15px;
     }
 
     .target {
       flex: 1;
-      min-height: 100px;
+      min-height: 65px;
       background: #e9eef6;
       color: #354b6b;
     }
 
-    .hidden { display: none; }
-
-    #feedback {
-      min-height: 35px;
-      font-size: 20px;
-      font-weight: bold;
-      margin: 15px;
+    .target:hover:not(:disabled) {
+      background: #dce6f4;
     }
 
-    @media(max-width:480px) {
-      body { padding: 10px; }
-      main { padding: 18px; }
+    #feedback {
+      min-height: 28px;
+      margin: 12px;
+    }
+
+    .result-panel {
+      background: #edf2f8;
+      border-radius: 15px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    .result-panel h2 {
+      color: #354b6b;
+    }
+
+    /* 選択した対象物の移動アニメーション */
+    .flying-item {
+      position: fixed;
+      z-index: 1000;
+      width: 64px;
+      height: 64px;
+      background: white;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      pointer-events: none;
+      transition:
+        left 0.5s ease,
+        top 0.5s ease,
+        transform 0.5s ease;
+    }
+
+    .flying-item svg {
+      width: 48px;
+      height: 48px;
+    }
+
+    @media(max-width: 560px) {
+      body { padding: 8px; }
+      main { padding: 12px; }
+
+      .sorting-board {
+        grid-template-columns: 1fr 95px 1fr;
+        gap: 5px;
+      }
+
+      .sorting-column {
+        padding: 6px;
+        min-height: 260px;
+      }
+
+      .sorted-item {
+        width: 52px;
+        height: 52px;
+      }
+
+      .sorted-item svg {
+        width: 40px;
+        height: 40px;
+      }
+
+      .center-area { padding-top: 55px; }
+
+      .current-shape {
+        width: 85px;
+        height: 85px;
+      }
+
+      .current-shape svg {
+        width: 72px;
+        height: 72px;
+      }
+
+      .column-title { font-size: 14px; }
+      .target { font-size: 16px; padding: 10px 5px; }
     }
   </style>
 </head>
@@ -106,6 +278,7 @@
 <body>
 <main>
 
+  <!-- ホーム画面 -->
   <section id="home">
     <h1>認知課題トレーニング</h1>
     <p>ルールに従って図形を分類しましょう。</p>
@@ -128,33 +301,61 @@
     </button>
   </section>
 
+  <!-- 課題画面 -->
   <section id="game" class="hidden">
+
     <h2 id="questionNumber"></h2>
 
     <div class="rule" id="gameRule"></div>
 
-    <div class="shape-area" id="shapeArea"></div>
+    <div class="sorting-board">
 
-    <div class="targets">
-      <button class="target" onclick="answer('left')">
-        左に分類
-      </button>
+      <!-- 左側 -->
+      <div class="sorting-column" id="leftColumn">
+        <div class="column-title">左側</div>
+        <div class="item-list" id="leftList"></div>
+      </div>
 
-      <button class="target" onclick="answer('right')">
-        右に分類
-      </button>
+      <!-- 中央 -->
+      <div class="center-area">
+        <div class="current-label">今回の対象物</div>
+        <div class="current-shape" id="shapeArea"></div>
+      </div>
+
+      <!-- 右側 -->
+      <div class="sorting-column" id="rightColumn">
+        <div class="column-title">右側</div>
+        <div class="item-list" id="rightList"></div>
+      </div>
+
     </div>
 
     <div id="feedback"></div>
-  </section>
 
-  <section id="result" class="hidden">
-    <h1>課題終了</h1>
-    <h2 id="score"></h2>
-    <p id="accuracy"></p>
-    <button class="primary" onclick="location.reload()">
-      もう一度
-    </button>
+    <div class="targets" id="answerButtons">
+      <button class="target" id="leftButton"
+        onclick="answer('left')">
+        ← 左に分類
+      </button>
+
+      <button class="target" id="rightButton"
+        onclick="answer('right')">
+        右に分類 →
+      </button>
+    </div>
+
+    <!-- 最終結果 -->
+    <div id="resultPanel" class="result-panel hidden">
+      <h2>答え合わせ</h2>
+      <h1 id="score"></h1>
+      <p id="accuracy"></p>
+      <p>〇：正解　✕：不正解</p>
+      <p>自分が分類した結果を確認してみましょう。</p>
+      <button class="primary" onclick="location.reload()">
+        もう一度挑戦する
+      </button>
+    </div>
+
   </section>
 
 </main>
@@ -167,6 +368,7 @@ let count = 0;
 let correct = 0;
 let startedAt = 0;
 let records = [];
+let isAnimating = false;
 
 function ruleText() {
   return level === 1
@@ -179,22 +381,59 @@ document.getElementById("level").onchange = function() {
   document.getElementById("homeRule").textContent = ruleText();
 };
 
+// 図形のSVGを作る
+function createShapeSVG(color, shape) {
+  if (shape === "circle") {
+    return `
+      <svg viewBox="0 0 110 110">
+        <circle cx="55" cy="55" r="45" fill="${color}"/>
+      </svg>
+    `;
+  }
+
+  return `
+    <svg viewBox="0 0 110 110">
+      <polygon points="55,5 105,100 5,100" fill="${color}"/>
+    </svg>
+  `;
+}
+
+// 開始
 function startGame() {
-  participantId = document.getElementById("participant").value.trim();
+  participantId =
+    document.getElementById("participant").value.trim();
+
   if (!participantId) {
     alert("参加者IDを入力してください");
+    document.getElementById("participant").focus();
     return;
   }
 
   level = Number(document.getElementById("level").value);
 
+  count = 0;
+  correct = 0;
+  records = [];
+  isAnimating = false;
+
+  document.getElementById("leftList").innerHTML = "";
+  document.getElementById("rightList").innerHTML = "";
+
   document.getElementById("home").classList.add("hidden");
   document.getElementById("game").classList.remove("hidden");
+
   document.getElementById("gameRule").textContent = ruleText();
+
+  document.getElementById("answerButtons").classList.remove("hidden");
+  document.getElementById("resultPanel").classList.add("hidden");
+
+  document.getElementById("leftColumn").classList.remove("review-mode");
+  document.getElementById("rightColumn").classList.remove("review-mode");
 
   nextQuestion();
 }
 
+// 次の問題
 function nextQuestion() {
   if (count >= 10) {
     finishGame();
@@ -204,13 +443,9 @@ function nextQuestion() {
   const color = Math.random() < 0.5 ? "red" : "blue";
   const shape = Math.random() < 0.5 ? "circle" : "triangle";
 
-  let answerSide;
-
-  if (level === 1) {
-    answerSide = color === "red" ? "left" : "right";
-  } else {
-    answerSide = shape === "circle" ? "left" : "right";
-  }
+  const answerSide = level === 1
+    ? (color === "red" ? "left" : "right")
+    : (shape === "circle" ? "left" : "right");
 
   current = {
     color,
@@ -218,60 +453,126 @@ function nextQuestion() {
     answerSide
   };
 
-  const shapeHTML = shape === "circle"
-    ? `<circle cx="55" cy="55" r="45" fill="${color}"/>`
-    : `<polygon points="55,5 105,100 5,100" fill="${color}"/>`;
-
-  document.getElementById("shapeArea").innerHTML = `
-    <svg class="shape" viewBox="0 0 110 110">
-      ${shapeHTML}
-    </svg>
-  `;
+  document.getElementById("shapeArea").innerHTML =
+    createShapeSVG(color, shape);
 
   document.getElementById("questionNumber").textContent =
     `${count + 1} / 10 問`;
 
   document.getElementById("feedback").textContent = "";
 
+  document.getElementById("leftButton").disabled = false;
+  document.getElementById("rightButton").disabled = false;
+
   startedAt = performance.now();
 }
 
+// 選択した対象物を左右に移動させる
 function answer(side) {
-  if (!current) return;
+  if (!current || isAnimating) return;
 
-  const reactionTime = Math.round(
-    performance.now() - startedAt
-  );
+  isAnimating = true;
 
+  document.getElementById("leftButton").disabled = true;
+  document.getElementById("rightButton").disabled = true;
+
+  const reactionTime = Math.round(performance.now() - startedAt);
   const isCorrect = side === current.answerSide;
 
   if (isCorrect) correct++;
 
-  records.push({
+  const record = {
     participantId,
     level,
     trial: count + 1,
     color: current.color,
     shape: current.shape,
+    correctSide: current.answerSide,
     answer: side,
     correct: isCorrect,
     reactionTimeMs: reactionTime,
     timestamp: new Date().toISOString()
+  };
+
+  records.push(record);
+
+  // 現在の図形の位置を取得
+  const source = document.getElementById("shapeArea");
+  const sourceRect = source.getBoundingClientRect();
+
+  // 移動先を取得
+  const targetList = document.getElementById(
+    side === "left" ? "leftList" : "rightList"
+  );
+
+  const targetRect = targetList.getBoundingClientRect();
+
+  // 飛行する図形を作成
+  const flying = document.createElement("div");
+  flying.className = "flying-item";
+  flying.innerHTML = createShapeSVG(current.color, current.shape);
+
+  flying.style.left =
+    (sourceRect.left + sourceRect.width / 2 - 32) + "px";
+
+  flying.style.top =
+    (sourceRect.top + sourceRect.height / 2 - 32) + "px";
+
+  document.body.appendChild(flying);
+
+  // 移動先の位置を計算
+  const destinationX =
+    targetRect.left + targetRect.width / 2 - 32;
+
+  const destinationY =
+    targetRect.bottom - 70;
+
+  // アニメーション開始
+  requestAnimationFrame(() => {
+    flying.style.left = destinationX + "px";
+    flying.style.top = destinationY + "px";
+    flying.style.transform = "scale(0.85)";
   });
-
-  count++;
-
-  document.getElementById("feedback").textContent =
-    isCorrect ? "正解です！" : "もう一度確認しましょう";
 
   current = null;
 
-  setTimeout(nextQuestion, 700);
+  // アニメーション終了後、仕分けエリアに追加
+  setTimeout(() => {
+    flying.remove();
+
+    const item = document.createElement("div");
+    item.className = "sorted-item";
+    item.innerHTML =
+      createShapeSVG(record.color, record.shape) +
+      `<span class="result-mark ${
+        record.correct ? "mark-correct" : "mark-wrong"
+      }">${record.correct ? "〇" : "✕"}</span>`;
+
+    targetList.appendChild(item);
+
+    count++;
+    isAnimating = false;
+
+    if (count >= 10) {
+      finishGame();
+    } else {
+      nextQuestion();
+    }
+
+  }, 550);
 }
 
+// 最終結果と答え合わせ
 function finishGame() {
-  document.getElementById("game").classList.add("hidden");
-  document.getElementById("result").classList.remove("hidden");
+  document.getElementById("questionNumber").textContent =
+    "10問終了！";
+
+  document.getElementById("shapeArea").innerHTML = "";
+
+  document.getElementById("answerButtons").classList.add("hidden");
+
+  document.getElementById("leftColumn").classList.add("review-mode");
+  document.getElementById("rightColumn").classList.add("review-mode");
 
   document.getElementById("score").textContent =
     `${correct} / 10 問正解`;
@@ -279,14 +580,16 @@ function finishGame() {
   document.getElementById("accuracy").textContent =
     `正答率：${correct * 10}%`;
 
+  document.getElementById("resultPanel").classList.remove("hidden");
+
+  // 記録を保存
   localStorage.setItem(
     "cognitiveTrainingRecords",
     JSON.stringify(records)
   );
 }
-</script>
 
-<script>
+// Service Worker
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./sw.js");
 }
