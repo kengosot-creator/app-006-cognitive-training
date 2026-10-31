@@ -2,405 +2,669 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#526b91">
-  <link rel="manifest" href="manifest.json">
-  <title>認知課題トレーニング</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#526b91">
+<link rel="manifest" href="manifest.json">
+<title>認知課題トレーニング</title>
 
-  <style>
-    * { box-sizing: border-box; }
+<style>
+* {
+  box-sizing: border-box;
+}
 
-    body {
-      margin: 0;
-      padding: 16px;
-      background: #f4f6fa;
-      color: #273449;
-      font-family: sans-serif;
-    }
+body {
+  margin: 0;
+  padding: 16px;
+  background: #f4f6fa;
+  color: #273449;
+  font-family: sans-serif;
+}
 
-    main {
-      max-width: 850px;
-      margin: auto;
-      background: white;
-      padding: 22px;
-      border-radius: 20px;
-      text-align: center;
-      min-height: 500px;
-    }
+main {
+  max-width: 1000px;
+  margin: auto;
+  background: white;
+  padding: 22px;
+  border-radius: 20px;
+  min-height: 550px;
+}
 
-    h1 { color: #354b6b; }
+h1, h2 {
+  text-align: center;
+  color: #354b6b;
+}
 
-    button, input, select {
-      font-size: 18px;
-      padding: 13px;
-      border-radius: 12px;
-    }
+p {
+  line-height: 1.6;
+}
 
-    input, select {
-      width: 100%;
-      border: 1px solid #bdc9d9;
-      margin: 8px 0 18px;
-    }
+.hidden {
+  display: none !important;
+}
 
-    button {
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-    }
+button, input, select {
+  font-size: 17px;
+  padding: 12px;
+  border-radius: 11px;
+}
 
-    button:disabled {
-      opacity: 0.5;
-      cursor: default;
-    }
+button {
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
 
-    .primary {
-      background: #526b91;
-      color: white;
-      width: 100%;
-    }
+button:disabled {
+  opacity: .45;
+  cursor: default;
+}
 
-    .rule {
-      background: #edf2f8;
-      padding: 15px;
-      border-radius: 12px;
-      font-size: 20px;
-      font-weight: bold;
-      margin: 15px 0;
-    }
+input, select {
+  width: 100%;
+  border: 1px solid #bdc9d9;
+  margin: 7px 0 17px;
+  background: white;
+  color: #273449;
+}
 
-    .hidden { display: none !important; }
+.primary {
+  width: 100%;
+  background: #526b91;
+  color: white;
+  padding: 15px;
+}
 
-    /* 仕分けエリア */
-    .sorting-board {
-      display: grid;
-      grid-template-columns: 1fr 130px 1fr;
-      gap: 10px;
-      align-items: stretch;
-      margin: 20px 0;
-    }
+.secondary {
+  background: #e9eef6;
+  color: #354b6b;
+}
 
-    .sorting-column {
-      background: #f0f3f8;
-      border-radius: 14px;
-      padding: 10px;
-      min-height: 300px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-    }
+.label {
+  font-weight: bold;
+  display: block;
+  margin-top: 12px;
+}
 
-    .column-title {
-      font-weight: bold;
-      color: #354b6b;
-      font-size: 17px;
-      padding: 8px;
-      border-bottom: 2px solid #d3dce9;
-      width: 100%;
-    }
+.rule {
+  background: #edf2f8;
+  border-radius: 12px;
+  padding: 15px;
+  margin: 15px 0;
+  text-align: center;
+}
 
-    .item-list {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      width: 100%;
-    }
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
 
-    .sorted-item {
-      width: 64px;
-      height: 64px;
-      background: white;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-      flex-shrink: 0;
-    }
+.settings-box {
+  background: #f7f8fb;
+  padding: 12px;
+  border-radius: 12px;
+}
 
-    .sorted-item svg {
-      width: 48px;
-      height: 48px;
-    }
+.settings-box label {
+  display: block;
+  font-weight: bold;
+  font-size: 14px;
+}
 
-    .result-mark {
-      position: absolute;
-      right: -7px;
-      top: -7px;
-      width: 27px;
-      height: 27px;
-      border-radius: 50%;
-      background: white;
-      font-size: 23px;
-      font-weight: bold;
-      line-height: 27px;
-      display: none;
-    }
+.description {
+  color: #718096;
+  font-size: 13px;
+}
 
-    .review-mode .result-mark {
-      display: block;
-    }
+.step-indicator {
+  text-align: center;
+  color: #718096;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
 
-    .mark-correct { color: #16a34a; }
-    .mark-wrong { color: #dc4444; }
+/* ルール学習 */
+.mapping-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  margin: 20px 0;
+}
 
-    /* 中央の問題表示 */
-    .center-area {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding-top: 55px;
-    }
+.mapping-card {
+  background: #f1f4f8;
+  border-radius: 13px;
+  padding: 14px 8px;
+  text-align: center;
+}
 
-    .current-label {
-      font-size: 13px;
-      color: #78869a;
-      margin-bottom: 12px;
-    }
+.mapping-number {
+  font-size: 25px;
+  font-weight: bold;
+  color: #526b91;
+}
 
-    .current-shape {
-      width: 110px;
-      height: 110px;
-      display: grid;
-      place-items: center;
-      background: #fafbfd;
-      border-radius: 15px;
-    }
+.mapping-stimulus {
+  height: 75px;
+  display: grid;
+  place-items: center;
+}
 
-    .current-shape svg {
-      width: 90px;
-      height: 90px;
-    }
+.mapping-stimulus svg {
+  width: 65px;
+  height: 65px;
+}
 
-    .targets {
-      display: flex;
-      gap: 12px;
-      margin-top: 15px;
-    }
+/* 練習 */
+.practice-box {
+  text-align: center;
+  padding: 15px;
+  background: #f7f8fb;
+  border-radius: 15px;
+  margin: 15px 0;
+}
 
-    .target {
-      flex: 1;
-      min-height: 65px;
-      background: #e9eef6;
-      color: #354b6b;
-    }
+.practice-shape {
+  height: 150px;
+  display: grid;
+  place-items: center;
+}
 
-    .target:hover:not(:disabled) {
-      background: #dce6f4;
-    }
+.practice-shape svg {
+  width: 110px;
+  height: 110px;
+}
 
-    #feedback {
-      min-height: 28px;
-      margin: 12px;
-    }
+/* 本番課題 */
+.game-header {
+  text-align: center;
+}
 
-    .result-panel {
-      background: #edf2f8;
-      border-radius: 15px;
-      padding: 20px;
-      margin-top: 20px;
-    }
+.progress-track {
+  height: 9px;
+  background: #e9eef6;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 12px 0;
+}
 
-    .result-panel h2 {
-      color: #354b6b;
-    }
+.progress-bar {
+  height: 100%;
+  width: 0;
+  background: #718eaf;
+  transition: width .2s;
+}
 
-    /* 選択した対象物の移動アニメーション */
-    .flying-item {
-      position: fixed;
-      z-index: 1000;
-      width: 64px;
-      height: 64px;
-      background: white;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-      pointer-events: none;
-      transition:
-        left 0.5s ease,
-        top 0.5s ease,
-        transform 0.5s ease;
-    }
+.game-rule {
+  text-align: center;
+  background: #edf2f8;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: bold;
+  margin: 12px 0;
+}
 
-    .flying-item svg {
-      width: 48px;
-      height: 48px;
-    }
+/* 分類枠 */
+.sorting-board {
+  display: grid;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  align-items: start;
+}
 
-    @media(max-width: 560px) {
-      body { padding: 8px; }
-      main { padding: 12px; }
+.category-panel {
+  min-width: 0;
+  background: #f0f3f8;
+  border-radius: 13px;
+  padding: 8px;
+}
 
-      .sorting-board {
-        grid-template-columns: 1fr 95px 1fr;
-        gap: 5px;
-      }
+.category-title {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  padding: 9px;
+  border-bottom: 2px solid #d3dce9;
+  margin-bottom: 10px;
+}
 
-      .sorting-column {
-        padding: 6px;
-        min-height: 260px;
-      }
+.items-scroll {
+  overflow-x: auto;
+  min-height: 100px;
+  padding: 2px;
+}
 
-      .sorted-item {
-        width: 52px;
-        height: 52px;
-      }
+.item-list {
+  display: grid;
+  grid-template-rows: repeat(5, 55px);
+  grid-auto-flow: column;
+  grid-auto-columns: 55px;
+  gap: 7px;
+  justify-content: start;
+  align-content: start;
+  min-height: 300px;
+}
 
-      .sorted-item svg {
-        width: 40px;
-        height: 40px;
-      }
+.sorted-item {
+  width: 55px;
+  height: 55px;
+  background: white;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 2px 5px rgba(0,0,0,.07);
+  opacity: 0;
+  transition: opacity .2s;
+}
 
-      .center-area { padding-top: 55px; }
+.sorted-item.visible {
+  opacity: 1;
+}
 
-      .current-shape {
-        width: 85px;
-        height: 85px;
-      }
+.sorted-item svg {
+  width: 43px;
+  height: 43px;
+}
 
-      .current-shape svg {
-        width: 72px;
-        height: 72px;
-      }
+.result-mark {
+  position: absolute;
+  right: -6px;
+  top: -7px;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: white;
+  font-size: 22px;
+  font-weight: bold;
+  line-height: 25px;
+  text-align: center;
+  display: none;
+}
 
-      .column-title { font-size: 14px; }
-      .target { font-size: 16px; padding: 10px 5px; }
-    }
-  </style>
+.review-mode .result-mark {
+  display: block;
+}
+
+.mark-correct {
+  color: #16a34a;
+}
+
+.mark-wrong {
+  color: #dc4444;
+}
+
+.target-buttons {
+  display: grid;
+  gap: 8px;
+  margin: 15px 0;
+}
+
+.target-button {
+  background: #e9eef6;
+  color: #354b6b;
+  min-height: 60px;
+  font-size: 18px;
+}
+
+.target-button:active {
+  background: #d4dfed;
+}
+
+.current-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 15px auto;
+}
+
+.current-label {
+  color: #718096;
+  font-size: 13px;
+}
+
+.current-shape {
+  width: 125px;
+  height: 125px;
+  background: #fafbfd;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  margin: 8px;
+}
+
+.current-shape svg {
+  width: 100px;
+  height: 100px;
+}
+
+.feedback {
+  min-height: 28px;
+  text-align: center;
+  font-weight: bold;
+  margin: 8px;
+}
+
+/* アニメーション */
+.flying-item {
+  position: fixed;
+  z-index: 1000;
+  width: 55px;
+  height: 55px;
+  background: white;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  box-shadow: 0 4px 14px rgba(0,0,0,.2);
+  transition:
+    left .5s ease,
+    top .5s ease,
+    transform .5s ease;
+}
+
+.flying-item svg {
+  width: 43px;
+  height: 43px;
+}
+
+/* 結果 */
+.result-panel {
+  background: #edf2f8;
+  padding: 20px;
+  border-radius: 15px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.result-score {
+  font-size: 32px;
+  font-weight: bold;
+  color: #354b6b;
+}
+
+.summary-list {
+  text-align: left;
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 15px;
+}
+
+@media(max-width: 600px) {
+  body {
+    padding: 7px;
+  }
+
+  main {
+    padding: 12px;
+  }
+
+  .settings-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+  }
+
+  .sorting-board {
+    gap: 6px;
+  }
+
+  .category-panel {
+    padding: 5px;
+  }
+
+  .category-title {
+    font-size: 15px;
+  }
+
+  .item-list {
+    grid-template-rows: repeat(5, 45px);
+    grid-auto-columns: 45px;
+    gap: 5px;
+  }
+
+  .sorted-item {
+    width: 45px;
+    height: 45px;
+  }
+
+  .sorted-item svg {
+    width: 35px;
+    height: 35px;
+  }
+
+  .current-shape {
+    width: 100px;
+    height: 100px;
+  }
+
+  .current-shape svg {
+    width: 80px;
+    height: 80px;
+  }
+}
+</style>
 </head>
 
 <body>
 <main>
 
-  <!-- ホーム画面 -->
-  <section id="home">
-    <h1>認知課題トレーニング</h1>
-    <p>ルールに従って図形を分類しましょう。</p>
+<!-- 設定画面 -->
+<section id="home">
+  <h1>認知課題トレーニング</h1>
+  <p style="text-align:center">
+    図形を見て、ルールに従って分類しましょう。
+  </p>
 
-    <label>参加者ID</label>
-    <input id="participant" placeholder="例：P001">
+  <label class="label">参加者ID</label>
+  <input id="participant" placeholder="例：P001">
 
-    <label>難易度</label>
-    <select id="level">
-      <option value="1">Lv.1 色で分類</option>
-      <option value="2">Lv.2 形で分類</option>
-    </select>
-
-    <div class="rule" id="homeRule">
-      赤色は左、青色は右
+  <div class="settings-grid">
+    <div class="settings-box">
+      <label for="taskType">分類する対象</label>
+      <select id="taskType">
+        <option value="color">色で分類</option>
+        <option value="shape">形で分類</option>
+      </select>
     </div>
 
-    <button class="primary" onclick="startGame()">
-      開始する
-    </button>
-  </section>
+    <div class="settings-box">
+      <label for="questionCount">問題数</label>
+      <select id="questionCount">
+        <option value="10">10問</option>
+        <option value="20">20問</option>
+        <option value="30">30問</option>
+        <option value="40">40問</option>
+        <option value="50" selected>50問</option>
+      </select>
+    </div>
 
-  <!-- 課題画面 -->
-  <section id="game" class="hidden">
+    <div class="settings-box">
+      <label for="typeCount">分類する種類数</label>
+      <select id="typeCount">
+        <option value="2">2種類</option>
+        <option value="3">3種類</option>
+        <option value="4">4種類</option>
+        <option value="5">5種類</option>
+      </select>
+    </div>
 
+    <div class="settings-box">
+      <label>練習問題</label>
+      <select id="practiceCount">
+        <option value="1">各種類1問</option>
+        <option value="2" selected>各種類2問</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="description">
+    ※ 色で分類する場合は色の種類数、形で分類する場合は形の種類数が分類枠の数になります。
+  </div>
+
+  <div class="rule">
+    分類枠は番号で表示されます。
+  </div>
+
+  <button class="primary" onclick="beginLearning()">
+    課題を開始する
+  </button>
+</section>
+
+<!-- ルール学習 -->
+<section id="learning" class="hidden">
+  <div class="step-indicator">STEP 1 / 3</div>
+  <h2>ルールを覚えましょう</h2>
+  <p style="text-align:center">
+    図形と番号の組み合わせを確認してください。
+  </p>
+
+  <div class="mapping-list" id="mappingList"></div>
+
+  <div class="rule">
+    この対応関係を覚えてから、練習に進みます。
+  </div>
+
+  <button class="primary" onclick="beginPractice()">
+    練習に進む
+  </button>
+</section>
+
+<!-- 練習 -->
+<section id="practice" class="hidden">
+  <div class="step-indicator">STEP 2 / 3</div>
+  <h2>練習問題</h2>
+  <div id="practiceProgress" style="text-align:center"></div>
+
+  <div class="practice-box">
+    <p>この図形はどの番号に分類しますか？</p>
+    <div class="practice-shape" id="practiceShape"></div>
+  </div>
+
+  <div class="target-buttons" id="practiceButtons"></div>
+  <div class="feedback" id="practiceFeedback"></div>
+</section>
+
+<!-- 本番 -->
+<section id="game" class="hidden">
+  <div class="step-indicator">STEP 3 / 3　本番課題</div>
+
+  <div class="game-header">
     <h2 id="questionNumber"></h2>
-
-    <div class="rule" id="gameRule"></div>
-
-    <div class="sorting-board">
-
-      <!-- 左側 -->
-      <div class="sorting-column" id="leftColumn">
-        <div class="column-title">左側</div>
-        <div class="item-list" id="leftList"></div>
-      </div>
-
-      <!-- 中央 -->
-      <div class="center-area">
-        <div class="current-label">今回の対象物</div>
-        <div class="current-shape" id="shapeArea"></div>
-      </div>
-
-      <!-- 右側 -->
-      <div class="sorting-column" id="rightColumn">
-        <div class="column-title">右側</div>
-        <div class="item-list" id="rightList"></div>
-      </div>
-
+    <div class="progress-track">
+      <div class="progress-bar" id="progressBar"></div>
     </div>
+  </div>
 
-    <div id="feedback"></div>
+  <div class="game-rule">
+    図形を見て、該当する番号を選んでください。
+  </div>
 
-    <div class="targets" id="answerButtons">
-      <button class="target" id="leftButton"
-        onclick="answer('left')">
-        ← 左に分類
-      </button>
+  <div class="current-area">
+    <div class="current-label">今回の対象物</div>
+    <div class="current-shape" id="shapeArea"></div>
+  </div>
 
-      <button class="target" id="rightButton"
-        onclick="answer('right')">
-        右に分類 →
-      </button>
-    </div>
+  <div class="target-buttons" id="answerButtons"></div>
 
-    <!-- 最終結果 -->
-    <div id="resultPanel" class="result-panel hidden">
-      <h2>答え合わせ</h2>
-      <h1 id="score"></h1>
-      <p id="accuracy"></p>
-      <p>〇：正解　✕：不正解</p>
-      <p>自分が分類した結果を確認してみましょう。</p>
-      <button class="primary" onclick="location.reload()">
-        もう一度挑戦する
-      </button>
-    </div>
+  <div class="feedback" id="feedback"></div>
 
-  </section>
+  <h3 style="text-align:center">仕分け結果</h3>
+  <div class="sorting-board" id="sortingBoard"></div>
+
+  <div id="resultPanel" class="result-panel hidden">
+    <h2>答え合わせ</h2>
+    <div class="result-score" id="score"></div>
+    <p id="accuracy"></p>
+    <p>〇：正解　✕：不正解</p>
+    <div class="summary-list" id="categorySummary"></div>
+    <button class="primary" onclick="location.reload()">
+      新しい課題を始める
+    </button>
+  </div>
+</section>
 
 </main>
 
 <script>
-let participantId = "";
-let level = 1;
-let current = null;
-let count = 0;
-let correct = 0;
-let startedAt = 0;
-let records = [];
-let isAnimating = false;
+/* ================================
+   基本設定
+================================ */
 
-function ruleText() {
-  return level === 1
-    ? "赤色は左、青色は右"
-    : "丸は左、三角は右";
+const COLORS = [
+  {id:"red", name:"赤", value:"#e34b4b"},
+  {id:"blue", name:"青", value:"#4387d6"},
+  {id:"yellow", name:"黄", value:"#e7bd36"},
+  {id:"green", name:"緑", value:"#45a36b"},
+  {id:"purple", name:"紫", value:"#9064bd"}
+];
+
+const SHAPES = [
+  {id:"circle", name:"丸"},
+  {id:"triangle", name:"三角"},
+  {id:"square", name:"四角"},
+  {id:"star", name:"星"},
+  {id:"diamond", name:"ひし形"}
+];
+
+let config = {};
+let categories = [];
+let questions = [];
+let practiceQuestions = [];
+let practiceIndex = 0;
+let currentQuestion = null;
+let questionIndex = 0;
+let records = [];
+let correctCount = 0;
+let startedAt = 0;
+let isAnimating = false;
+let practiceLocked = false;
+let sessionId = "";
+
+/* ================================
+   画面切り替え
+================================ */
+
+function showSection(id) {
+  ["home","learning","practice","game"].forEach(name => {
+    document.getElementById(name).classList.add("hidden");
+  });
+
+  document.getElementById(id).classList.remove("hidden");
 }
 
-document.getElementById("level").onchange = function() {
-  level = Number(this.value);
-  document.getElementById("homeRule").textContent = ruleText();
-};
+/* ================================
+   SVG作成
+================================ */
 
-// 図形のSVGを作る
 function createShapeSVG(color, shape) {
-  if (shape === "circle") {
-    return `
-      <svg viewBox="0 0 110 110">
-        <circle cx="55" cy="55" r="45" fill="${color}"/>
-      </svg>
-    `;
-  }
+  const fill = color;
+
+  const shapes = {
+    circle: `<circle cx="55" cy="55" r="43" fill="${fill}"/>`,
+    triangle: `<polygon points="55,8 103,98 7,98" fill="${fill}"/>`,
+    square: `<rect x="12" y="12" width="86" height="86" rx="5" fill="${fill}"/>`,
+    star: `<polygon points="55,5 67,39 103,39 74,61 85,98 55,76 25,98 36,61 7,39 43,39" fill="${fill}"/>`,
+    diamond: `<polygon points="55,5 105,55 55,105 5,55" fill="${fill}"/>`
+  };
 
   return `
-    <svg viewBox="0 0 110 110">
-      <polygon points="55,5 105,100 5,100" fill="${color}"/>
+    <svg viewBox="0 0 110 110" aria-hidden="true">
+      ${shapes[shape]}
     </svg>
   `;
 }
 
-// 開始
-function startGame() {
-  participantId =
+/* ================================
+   課題設定
+================================ */
+
+function beginLearning() {
+  const participantId =
     document.getElementById("participant").value.trim();
 
   if (!participantId) {
@@ -409,86 +673,315 @@ function startGame() {
     return;
   }
 
-  level = Number(document.getElementById("level").value);
+  const taskType =
+    document.getElementById("taskType").value;
 
-  count = 0;
-  correct = 0;
+  const typeCount =
+    Number(document.getElementById("typeCount").value);
+
+  config = {
+    participantId,
+    taskType,
+    questionCount:
+      Number(document.getElementById("questionCount").value),
+    typeCount,
+    practicePerCategory:
+      Number(document.getElementById("practiceCount").value)
+  };
+
+  const source = taskType === "color" ? COLORS : SHAPES;
+
+  categories = source.slice(0, typeCount).map((item, index) => ({
+    id: item.id,
+    name: item.name,
+    number: index + 1,
+    color: item.value || null
+  }));
+
+  sessionId =
+    "S" + Date.now() + "-" +
+    Math.random().toString(36).slice(2,7);
+
   records = [];
-  isAnimating = false;
+  correctCount = 0;
+  questionIndex = 0;
+  practiceIndex = 0;
 
-  document.getElementById("leftList").innerHTML = "";
-  document.getElementById("rightList").innerHTML = "";
+  createMapping();
+  createQuestions();
+  createPracticeQuestions();
+  createSortingBoard();
 
-  document.getElementById("home").classList.add("hidden");
-  document.getElementById("game").classList.remove("hidden");
+  showSection("learning");
+}
 
-  document.getElementById("gameRule").textContent = ruleText();
+/* ================================
+   学習画面
+================================ */
 
-  document.getElementById("answerButtons").classList.remove("hidden");
-  document.getElementById("resultPanel").classList.add("hidden");
+function createMapping() {
+  const list = document.getElementById("mappingList");
+  list.innerHTML = "";
 
-  document.getElementById("leftColumn").classList.remove("review-mode");
-  document.getElementById("rightColumn").classList.remove("review-mode");
+  categories.forEach(category => {
+    const card = document.createElement("div");
+    card.className = "mapping-card";
+
+    const color = config.taskType === "color"
+      ? category.color
+      : "#7087a7";
+
+    const shape = config.taskType === "shape"
+      ? category.id
+      : randomItem(SHAPES).id;
+
+    card.innerHTML = `
+      <div class="mapping-number">${category.number}</div>
+      <div class="mapping-stimulus">
+        ${createShapeSVG(color || "#7087a7", shape)}
+      </div>
+      <strong>${category.name}</strong>
+    `;
+
+    list.appendChild(card);
+  });
+}
+
+/* ================================
+   問題作成
+================================ */
+
+function randomItem(array) {
+  return array[Math.floor(Math.random() * array.length)];
+}
+
+function createStimulus(category) {
+  const color = config.taskType === "color"
+    ? category.color
+    : randomItem(COLORS).value;
+
+  const shape = config.taskType === "shape"
+    ? category.id
+    : randomItem(SHAPES).id;
+
+  return {
+    categoryId: category.id,
+    categoryNumber: category.number,
+    categoryName: category.name,
+    color,
+    shape
+  };
+}
+
+function createQuestions() {
+  questions = [];
+
+  for (let i = 0; i < config.questionCount; i++) {
+    const category = categories[i % categories.length];
+    questions.push(createStimulus(category));
+  }
+
+  shuffle(questions);
+}
+
+function createPracticeQuestions() {
+  practiceQuestions = [];
+
+  categories.forEach(category => {
+    for (let i = 0; i < config.practicePerCategory; i++) {
+      practiceQuestions.push(createStimulus(category));
+    }
+  });
+
+  shuffle(practiceQuestions);
+}
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+/* ================================
+   練習
+================================ */
+
+function beginPractice() {
+  practiceIndex = 0;
+  showSection("practice");
+  showPracticeQuestion();
+}
+
+function showPracticeQuestion() {
+  if (practiceIndex >= practiceQuestions.length) {
+    startMainGame();
+    return;
+  }
+
+  practiceLocked = false;
+
+  const q = practiceQuestions[practiceIndex];
+
+  document.getElementById("practiceProgress").textContent =
+    `練習 ${practiceIndex + 1} / ${practiceQuestions.length}`;
+
+  document.getElementById("practiceShape").innerHTML =
+    createShapeSVG(q.color, q.shape);
+
+  document.getElementById("practiceFeedback").textContent = "";
+
+  const buttons = document.getElementById("practiceButtons");
+  buttons.innerHTML = "";
+  buttons.style.gridTemplateColumns =
+    `repeat(${Math.min(categories.length, 3)}, minmax(0,1fr))`;
+
+  categories.forEach(category => {
+    const button = document.createElement("button");
+    button.className = "target-button secondary";
+    button.textContent = ` ${category.number} `;
+
+    button.onclick = () => answerPractice(category.number);
+
+    buttons.appendChild(button);
+  });
+}
+
+function answerPractice(number) {
+  if (practiceLocked) return;
+
+  practiceLocked = true;
+
+  const q = practiceQuestions[practiceIndex];
+  const correct = number === q.categoryNumber;
+
+  document.getElementById("practiceFeedback").textContent =
+    correct ? "正解です！" : `正解は ${q.categoryNumber} です。`;
+
+  document.querySelectorAll("#practiceButtons button")
+    .forEach(button => button.disabled = true);
+
+  setTimeout(() => {
+    practiceIndex++;
+    showPracticeQuestion();
+  }, 850);
+}
+
+/* ================================
+   分類枠の作成
+================================ */
+
+function createSortingBoard() {
+  const board = document.getElementById("sortingBoard");
+  board.innerHTML = "";
+
+  board.style.gridTemplateColumns =
+    `repeat(${categories.length}, minmax(125px, 1fr))`;
+
+  board.style.minWidth =
+    `${categories.length * 125}px`;
+
+  categories.forEach(category => {
+    const panel = document.createElement("div");
+    panel.className = "category-panel";
+    panel.id = `panel-${category.number}`;
+
+    panel.innerHTML = `
+      <div class="category-title">${category.number}</div>
+      <div class="items-scroll">
+        <div class="item-list" id="list-${category.number}"></div>
+      </div>
+    `;
+
+    board.appendChild(panel);
+  });
+}
+
+/* ================================
+   本番開始
+================================ */
+
+function startMainGame() {
+  questionIndex = 0;
+  correctCount = 0;
+  records = [];
+
+  createSortingBoard();
+  showSection("game");
+
+  const buttons = document.getElementById("answerButtons");
+  buttons.innerHTML = "";
+  buttons.style.gridTemplateColumns =
+    `repeat(${Math.min(categories.length, 3)}, minmax(0,1fr))`;
+
+  categories.forEach(category => {
+    const button = document.createElement("button");
+    button.className = "target-button";
+    button.textContent = `${category.number}`;
+
+    button.onclick = () => answerMain(category.number);
+
+    buttons.appendChild(button);
+  });
 
   nextQuestion();
 }
 
-// 次の問題
 function nextQuestion() {
-  if (count >= 10) {
+  if (questionIndex >= questions.length) {
     finishGame();
     return;
   }
 
-  const color = Math.random() < 0.5 ? "red" : "blue";
-  const shape = Math.random() < 0.5 ? "circle" : "triangle";
-
-  const answerSide = level === 1
-    ? (color === "red" ? "left" : "right")
-    : (shape === "circle" ? "left" : "right");
-
-  current = {
-    color,
-    shape,
-    answerSide
-  };
-
-  document.getElementById("shapeArea").innerHTML =
-    createShapeSVG(color, shape);
+  currentQuestion = questions[questionIndex];
 
   document.getElementById("questionNumber").textContent =
-    `${count + 1} / 10 問`;
+    `${questionIndex + 1} / ${config.questionCount} 問`;
+
+  document.getElementById("progressBar").style.width =
+    `${questionIndex / config.questionCount * 100}%`;
+
+  document.getElementById("shapeArea").innerHTML =
+    createShapeSVG(currentQuestion.color, currentQuestion.shape);
 
   document.getElementById("feedback").textContent = "";
 
-  document.getElementById("leftButton").disabled = false;
-  document.getElementById("rightButton").disabled = false;
+  document.querySelectorAll("#answerButtons button")
+    .forEach(button => button.disabled = false);
 
   startedAt = performance.now();
+  isAnimating = false;
 }
 
-// 選択した対象物を左右に移動させる
-function answer(side) {
-  if (!current || isAnimating) return;
+/* ================================
+   本番の回答
+================================ */
+
+function answerMain(selectedNumber) {
+  if (!currentQuestion || isAnimating) return;
 
   isAnimating = true;
 
-  document.getElementById("leftButton").disabled = true;
-  document.getElementById("rightButton").disabled = true;
+  document.querySelectorAll("#answerButtons button")
+    .forEach(button => button.disabled = true);
 
   const reactionTime = Math.round(performance.now() - startedAt);
-  const isCorrect = side === current.answerSide;
+  const isCorrect =
+    selectedNumber === currentQuestion.categoryNumber;
 
-  if (isCorrect) correct++;
+  if (isCorrect) correctCount++;
 
   const record = {
-    participantId,
-    level,
-    trial: count + 1,
-    color: current.color,
-    shape: current.shape,
-    correctSide: current.answerSide,
-    answer: side,
+    participantId: config.participantId,
+    sessionId,
+    taskType: config.taskType,
+    typeCount: config.typeCount,
+    questionCount: config.questionCount,
+    trial: questionIndex + 1,
+    stimulusColor: currentQuestion.color,
+    stimulusShape: currentQuestion.shape,
+    correctCategory: currentQuestion.categoryNumber,
+    selectedCategory: selectedNumber,
     correct: isCorrect,
     reactionTimeMs: reactionTime,
     timestamp: new Date().toISOString()
@@ -496,100 +989,154 @@ function answer(side) {
 
   records.push(record);
 
-  // 現在の図形の位置を取得
+  moveItemToCategory(record);
+}
+
+/* ================================
+   対象物の移動アニメーション
+================================ */
+
+function moveItemToCategory(record) {
   const source = document.getElementById("shapeArea");
   const sourceRect = source.getBoundingClientRect();
 
-  // 移動先を取得
-  const targetList = document.getElementById(
-    side === "left" ? "leftList" : "rightList"
-  );
+  const targetList =
+    document.getElementById(`list-${record.selectedCategory}`);
 
-  const targetRect = targetList.getBoundingClientRect();
+  // 先に配置場所を確保
+  const item = document.createElement("div");
+  item.className = "sorted-item";
+  item.innerHTML =
+    createShapeSVG(record.stimulusColor, record.stimulusShape) +
+    `<span class="result-mark ${
+      record.correct ? "mark-correct" : "mark-wrong"
+    }">${record.correct ? "〇" : "✕"}</span>`;
 
-  // 飛行する図形を作成
+  targetList.appendChild(item);
+
+  const targetRect = item.getBoundingClientRect();
+
   const flying = document.createElement("div");
   flying.className = "flying-item";
-  flying.innerHTML = createShapeSVG(current.color, current.shape);
+  flying.innerHTML =
+    createShapeSVG(record.stimulusColor, record.stimulusShape);
 
   flying.style.left =
-    (sourceRect.left + sourceRect.width / 2 - 32) + "px";
+    (sourceRect.left + sourceRect.width / 2 - 27.5) + "px";
 
   flying.style.top =
-    (sourceRect.top + sourceRect.height / 2 - 32) + "px";
+    (sourceRect.top + sourceRect.height / 2 - 27.5) + "px";
 
   document.body.appendChild(flying);
 
-  // 移動先の位置を計算
-  const destinationX =
-    targetRect.left + targetRect.width / 2 - 32;
-
-  const destinationY =
-    targetRect.bottom - 70;
-
-  // アニメーション開始
   requestAnimationFrame(() => {
-    flying.style.left = destinationX + "px";
-    flying.style.top = destinationY + "px";
-    flying.style.transform = "scale(0.85)";
+    requestAnimationFrame(() => {
+      flying.style.left = targetRect.left + "px";
+      flying.style.top = targetRect.top + "px";
+      flying.style.transform = "scale(.9)";
+    });
   });
 
-  current = null;
+  item.style.opacity = "0";
 
-  // アニメーション終了後、仕分けエリアに追加
+  currentQuestion = null;
+
   setTimeout(() => {
     flying.remove();
+    item.classList.add("visible");
 
-    const item = document.createElement("div");
-    item.className = "sorted-item";
-    item.innerHTML =
-      createShapeSVG(record.color, record.shape) +
-      `<span class="result-mark ${
-        record.correct ? "mark-correct" : "mark-wrong"
-      }">${record.correct ? "〇" : "✕"}</span>`;
-
-    targetList.appendChild(item);
-
-    count++;
-    isAnimating = false;
-
-    if (count >= 10) {
-      finishGame();
-    } else {
-      nextQuestion();
-    }
-
+    questionIndex++;
+    nextQuestion();
   }, 550);
 }
 
-// 最終結果と答え合わせ
+/* ================================
+   終了・答え合わせ
+================================ */
+
 function finishGame() {
+  isAnimating = false;
+
   document.getElementById("questionNumber").textContent =
-    "10問終了！";
+    "課題終了";
+
+  document.getElementById("progressBar").style.width = "100%";
 
   document.getElementById("shapeArea").innerHTML = "";
-
   document.getElementById("answerButtons").classList.add("hidden");
 
-  document.getElementById("leftColumn").classList.add("review-mode");
-  document.getElementById("rightColumn").classList.add("review-mode");
+  categories.forEach(category => {
+    document.getElementById(`panel-${category.number}`)
+      .classList.add("review-mode");
+  });
 
   document.getElementById("score").textContent =
-    `${correct} / 10 問正解`;
+    `${correctCount} / ${config.questionCount}`;
+
+  const accuracy =
+    Math.round(correctCount / config.questionCount * 100);
 
   document.getElementById("accuracy").textContent =
-    `正答率：${correct * 10}%`;
+    `正答率：${accuracy}%`;
+
+  const summary = document.getElementById("categorySummary");
+  summary.innerHTML = "<strong>分類枠ごとの結果</strong>";
+
+  categories.forEach(category => {
+    const related = records.filter(
+      r => r.correctCategory === category.number
+    );
+
+    const correct = related.filter(r => r.correct).length;
+    const wrong = related.length - correct;
+
+    const row = document.createElement("p");
+    row.textContent =
+      `番号 ${category.number}：出題 ${related.length}問 ／ 正解 ${correct}問 ／ 誤答 ${wrong}問`;
+
+    summary.appendChild(row);
+  });
+
+  const averageTime = records.length
+    ? Math.round(
+        records.reduce((sum, r) => sum + r.reactionTimeMs, 0)
+        / records.length
+      )
+    : 0;
+
+  const time = document.createElement("p");
+  time.textContent = `平均反応時間：${averageTime} ms`;
+  summary.appendChild(time);
 
   document.getElementById("resultPanel").classList.remove("hidden");
 
-  // 記録を保存
+  // ブラウザ内に記録
+  const saved = JSON.parse(
+    localStorage.getItem("cognitiveTrainingRecords") || "[]"
+  );
+
+  saved.push({
+    sessionId,
+    config,
+    correctCount,
+    accuracy,
+    records
+  });
+
   localStorage.setItem(
     "cognitiveTrainingRecords",
-    JSON.stringify(records)
+    JSON.stringify(saved)
   );
+
+  // 終了時に最終画面まで移動
+  document.getElementById("resultPanel")
+    .scrollIntoView({behavior:"smooth", block:"start"});
 }
 
-// Service Worker
+/* ================================
+   Service Worker
+================================ */
+
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./sw.js");
 }
